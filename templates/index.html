@@ -377,7 +377,7 @@
             showLoading();
             hideResult();
 
-            fetch("http://127.0.0.1:5000/predict", {
+            fetch("/predict", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -428,7 +428,7 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 
-            fetch("http://127.0.0.1:5000/download_report", {
+            fetch("/download_report", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
