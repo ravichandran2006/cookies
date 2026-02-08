@@ -10,13 +10,14 @@ from datetime import datetime
 import io
 
 
+from flask import render_template
+
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "App is running successfully 🚀"
+    return render_template("index.html")
 
-# other routes below
 
 # Allow all origins
 CORS(app, resources={r"/*": {"origins": "*"}})
