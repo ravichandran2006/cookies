@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodTech AI - Biscuit Predictor</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .header i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .input-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #result {
+            display: none;
+            margin-top: 30px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .result-header h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .result-header .biscuit-count {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .ingredient-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .ingredient-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .ingredient-value {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .ingredients-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-cookie-bite"></i>
+            <h1>FoodTech AI</h1>
+            <p>Intelligent Biscuit Ingredient Predictor</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-cookie"></i>
+                        <input type="number" id="biscuits" placeholder="Enter number of biscuits" min="1">
+                    </div>
+                    <button class="btn btn-primary" onclick="predict()">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        Predict Ingredients
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #667eea;">Analyzing...</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div id="result">
+                <div class="result-header">
+                    <h2><i class="fas fa-chart-line"></i> Prediction Results</h2>
+                    <p class="biscuit-count">For <span id="biscuitCount">0</span> Biscuits</p>
+                </div>
+                
+                <div class="ingredients-grid" id="ingredientsList"></div>
+
+                <div class="actions">
+                    <button class="btn btn-success" onclick="downloadReport()">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                    <button class="btn btn-primary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i>
+                        New Prediction
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBiscuits = 0;
+        let currentIngredients = {};
+
+        function predict() {
+            const biscuits = document.getElementById("biscuits").value;
+
+            if (biscuits === "" || biscuits <= 0) {
+                showError("Please enter a valid number of biscuits");
+                return;
+            }
+
+            hideError();
+            showLoading();
+            hideResult();
+
+            fetch("http://127.0.0.1:5000/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    biscuits: parseInt(biscuits)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoading();
+                
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                currentBiscuits = biscuits;
+                currentIngredients = data;
+                displayResults(biscuits, data);
+            })
+            .catch(error => {
+                hideLoading();
+                showError("Failed to connect to server. Please make sure the server is running.");
+                console.error("Error:", error);
+            });
+        }
+
+        function displayResults(biscuits, data) {
+            document.getElementById("biscuitCount").textContent = biscuits;
+            
+            let html = "";
+            for (let key in data) {
+                html += `
+                    <div class="ingredient-card">
+                        <span class="ingredient-name">${key}</span>
+                        <span class="ingredient-value">${data[key]}</span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById("ingredientsList").innerHTML = html;
+            showResult();
+        }
+
+        function downloadReport() {
+            const btn = event.target.closest('.btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+
+            fetch("http://127.0.0.1:5000/download_report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    biscuits: currentBiscuits,
+                    ingredients: currentIngredients
+                })
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `biscuit_report_${new Date().getTime()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Download Report';
+            })
+            .catch(error => {
+                showError("Failed to generate report. Please try again.");
+                console.error("Error:", error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-download"></i> Download Report';
+            });
+        }
+
+        function resetForm() {
+            document.getElementById("biscuits").value = "";
+            hideResult();
+            hideError();
+            currentBiscuits = 0;
+            currentIngredients = {};
+        }
+
+        function showLoading() {
+            document.getElementById("loading").classList.add("active");
+        }
+
+        function hideLoading() {
+            document.getElementById("loading").classList.remove("active");
+        }
+
+        function showResult() {
+            document.getElementById("result").style.display = "block";
+        }
+
+        function hideResult() {
+            document.getElementById("result").style.display = "none";
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById("error");
+            errorDiv.textContent = message;
+            errorDiv.classList.add("active");
+        }
+
+        function hideError() {
+            document.getElementById("error").classList.remove("active");
+        }
+
+        // Allow Enter key to trigger prediction
+        document.getElementById("biscuits").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                predict();
+            }
+        });
+    </script>
+</body>
+</html>
