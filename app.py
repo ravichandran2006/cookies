@@ -12,6 +12,12 @@ import io
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "App is running successfully 🚀"
+
+# other routes below
+
 # Allow all origins
 CORS(app, resources={r"/*": {"origins": "*"}})
 
